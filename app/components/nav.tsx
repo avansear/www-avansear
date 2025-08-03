@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { InternalHoverButton } from './hover-button'
 
 const navItems = {
   '/': {
@@ -23,13 +23,9 @@ export function Navbar() {
           <div className="flex flex-row space-x-0 pr-10">
             {Object.entries(navItems).map(([path, { name }]) => {
               return (
-                <Link
-                  key={path}
-                  href={path}
-                  className="inline-block px-2 rounded-full transition-all duration-300 ease-out hover:scale-105 active:scale-95 m-1"
-                >
+                <InternalHoverButton key={path} href={path} className="m-1">
                   {name}
-                </Link>
+                </InternalHoverButton>
               )
             })}
           </div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 
 interface HoverButtonProps {
   children: React.ReactNode
@@ -16,5 +17,16 @@ export function HoverButton({ children, href, className = '' }: HoverButtonProps
     >
       {children}
     </a>
+  )
+}
+
+export function InternalHoverButton({ children, href, className = '' }: HoverButtonProps) {
+  return (
+    <Link
+      href={href}
+      className={`inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-[#ffd9f4] hover:text-[#14000f] hover:scale-105 active:scale-95 ${className}`}
+    >
+      {children}
+    </Link>
   )
 } 
