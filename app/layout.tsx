@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${baseUrl}/og?title=${encodeURIComponent('i\'m avan')}`,
+        url: `${baseUrl}/og?title=${encodeURIComponent('i\'m avan')}&v=2`,
         width: 1200,
         height: 630,
         alt: 'avan\'s portfolio',
