@@ -21,6 +21,17 @@ input[type='email'] {
   text-wrap: balance;
 }
 
+.postimg {
+  /*width: 150px;*/
+  padding: 4px 0;
+  border-radius: 16px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.postimg:hover {
+  transform: scale(1.02);
+}
+
 /* Grain texture overlay */
 body::before {
   content: '';
