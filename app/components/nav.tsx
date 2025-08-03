@@ -26,7 +26,7 @@ export function Navbar() {
                 <Link
                   key={path}
                   href={path}
-                  className="inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-white hover:text-black hover:scale-105 active:scale-95 m-1"
+                  className="inline-block px-2 rounded-full transition-all duration-300 ease-out hover:scale-105 active:scale-95 m-1"
                 >
                   {name}
                 </Link>

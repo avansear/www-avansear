@@ -1,5 +1,15 @@
 @import 'tailwindcss';
 
+:root {
+  --color-dark: #14000f;
+  --color-light: #ffd9f4;
+}
+
+@theme {
+  --color-custom-dark: #14000f;
+  --color-custom-light: #ffd9f4;
+}
+
 ::selection {
   background-color: #47a3f3;
   color: #fefefe;
