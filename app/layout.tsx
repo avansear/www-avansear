@@ -19,6 +19,14 @@ export const metadata: Metadata = {
     siteName: 'avan\'s portfolio',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: `${baseUrl}/og?title=${encodeURIComponent('i\'m avan')}`,
+        width: 1200,
+        height: 630,
+        alt: 'avan\'s portfolio',
+      },
+    ],
   },
   robots: {
     index: true,
