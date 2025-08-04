@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/blog/utils'
 import { baseUrl } from 'app/sitemap'
+import { ClientContent } from 'app/components/client-content'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()

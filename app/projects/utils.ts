@@ -54,12 +54,27 @@ export function getProjectPosts() {
 }
 
 export function formatDate(date: string, includeRelative = false) {
-  let currentDate = new Date()
   if (!date.includes('T')) {
     date = `${date}T00:00:00`
   }
   let targetDate = new Date(date)
 
+  let fullDate = targetDate.toLocaleString('en-us', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  if (!includeRelative) {
+    return fullDate
+  }
+
+  // Only calculate relative time on client side to avoid hydration mismatch
+  if (typeof window === 'undefined') {
+    return fullDate
+  }
+
+  let currentDate = new Date()
   let yearsAgo = currentDate.getFullYear() - targetDate.getFullYear()
   let monthsAgo = currentDate.getMonth() - targetDate.getMonth()
   let daysAgo = currentDate.getDate() - targetDate.getDate()
@@ -74,16 +89,6 @@ export function formatDate(date: string, includeRelative = false) {
     formattedDate = `${daysAgo}d ago`
   } else {
     formattedDate = 'Today'
-  }
-
-  let fullDate = targetDate.toLocaleString('en-us', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-
-  if (!includeRelative) {
-    return fullDate
   }
 
   return `${fullDate} (${formattedDate})`
