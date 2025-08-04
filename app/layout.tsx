@@ -13,9 +13,9 @@ export const metadata: Metadata = {
   title: 'avan',
   description: 'This is my portfolio.',
   icons: {
-    icon: '/icon',
-    shortcut: '/icon',
-    apple: '/apple-icon',
+    icon: '/favi.png',
+    shortcut: '/favi.png',
+    apple: '/favi.png',
   },
   openGraph: {
     title: 'i\'m avan',
