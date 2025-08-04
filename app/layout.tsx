@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: 'avan',
   description: 'This is my portfolio.',
+  icons: {
+    icon: '/icon',
+    shortcut: '/icon',
+    apple: '/apple-icon',
+  },
   openGraph: {
     title: 'i\'m avan',
     description: 'high functioning insmoniac. 20 y/o weirdo who does things based on instincts and intuition.',
