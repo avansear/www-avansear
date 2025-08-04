@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { formatDate, getProjectPosts } from '../utils'
 import { baseUrl } from '../../sitemap'
+import { ClientContent } from '../../components/client-content'
 
 export async function generateStaticParams() {
   let posts = getProjectPosts()
@@ -90,7 +91,7 @@ export default function Project({ params }) {
         </p>
       </div>
       <article className="prose">
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <ClientContent content={post.content} />
       </article>
     </section>
   )

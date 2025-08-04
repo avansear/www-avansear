@@ -91,7 +91,7 @@ export default function Blog({ params }) {
         </p>
       </div>
       <article className="prose">
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <ClientContent content={post.content} />
       </article>
     </section>
   )
