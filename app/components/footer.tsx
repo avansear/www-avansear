@@ -1,4 +1,7 @@
+'use client'
+
 import { HoverButton } from './hover-button'
+import { useState } from 'react'
 
 function ArrowIcon() {
   return (
@@ -18,9 +21,22 @@ function ArrowIcon() {
 }
 
 export default function Footer() {
+  const [emailCopied, setEmailCopied] = useState(false)
+  const email = 'me@avansear.com'
+
+  const handleEmailClick = async () => {
+    try {
+      await navigator.clipboard.writeText(email)
+      setEmailCopied(true)
+      setTimeout(() => setEmailCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy: ', err)
+    }
+  }
+
   return (
     <footer className="mb-16">
-              <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-[var(--color-accent)] md:flex-row md:space-x-4 md:space-y-0 dark:text-[var(--color-accent)]">
+      <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-[var(--color-accent)] md:flex-row md:space-x-4 md:space-y-0 dark:text-[var(--color-accent)]">
         <li>
           <HoverButton href="https://www.instagram.com/avansear/">
             <div className="flex items-center">
@@ -52,6 +68,17 @@ export default function Footer() {
               <p className="ml-2 h-7">github</p>
             </div>
           </HoverButton>
+        </li>
+        <li>
+          <button
+            onClick={handleEmailClick}
+            className="inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-[var(--color-light)] hover:text-[var(--color-dark)] hover:scale-105 active:scale-95"
+          >
+            <div className="flex items-center">
+              <ArrowIcon />
+              <p className="ml-2 h-7">{emailCopied ? 'email copied' : 'email'}</p>
+            </div>
+          </button>
         </li>
       </ul>
     </footer>
