@@ -13,7 +13,7 @@ export function HoverButton({ children, href, className = '' }: HoverButtonProps
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-[#ffd9f4] hover:text-[#14000f] hover:scale-105 active:scale-95 ${className}`}
+      className={`inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-[var(--color-light)] hover:text-[var(--color-dark)] hover:scale-105 active:scale-95 ${className}`}
     >
       {children}
     </a>
@@ -24,7 +24,7 @@ export function InternalHoverButton({ children, href, className = '' }: HoverBut
   return (
     <Link
       href={href}
-      className={`inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-[#ffd9f4] hover:text-[#14000f] hover:scale-105 active:scale-95 ${className}`}
+      className={`inline-block px-2 rounded-full transition-all duration-300 ease-out hover:bg-[var(--color-light)] hover:text-[var(--color-dark)] hover:scale-105 active:scale-95 ${className}`}
     >
       {children}
     </Link>
