@@ -7,7 +7,7 @@ export default function Page() {
         i'm avan
       </h1>
       <p className="mb-4">
-        {`high functioning insmoniac. 20 y/o weirdo who does things based on instincts and intuition.`}
+        {`high functioning insomniac. 20 y/o weirdo who does things based on instincts and intuition.`}
       </p>
     </section>
   )
