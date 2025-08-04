@@ -1,0 +1,5 @@
+html[data-theme="theme2"] {
+    --color-dark: #FFC15E;
+    --color-light: #1F0303;
+    --color-accent: #1F0303BF;
+}
