@@ -11,8 +11,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export function generateMetadata({ params }) {
-  let post = getProjectPosts().find((post) => post.slug === params.slug)
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params
+  let post = getProjectPosts().find((post) => post.slug === resolvedParams.slug)
   if (!post) {
     return
   }
@@ -51,8 +52,9 @@ export function generateMetadata({ params }) {
   }
 }
 
-export default function Project({ params }) {
-  let post = getProjectPosts().find((post) => post.slug === params.slug)
+export default async function Project({ params }) {
+  const resolvedParams = await params
+  let post = getProjectPosts().find((post) => post.slug === resolvedParams.slug)
 
   if (!post) {
     notFound()

@@ -24,4 +24,11 @@
 
 .bg-accent {
   background-color: var(--color-accent);
-} 
+}
+
+.postimg {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  margin: 16px 0px 16px 0px;
+}
