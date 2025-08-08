@@ -19,7 +19,17 @@ body {
     cursor: none !important;
   }
   
-  * {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+  
+  /* Force hide on all interactive elements in Firefox */
+  a, button, input, select, textarea, [role="button"], [tabindex] {
+    cursor: none !important;
+  }
+  
+  /* Firefox sometimes shows cursor on focus/hover */
+  *:hover, *:focus, *:active {
     cursor: none !important;
   }
 }
