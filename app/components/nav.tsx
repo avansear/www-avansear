@@ -26,19 +26,10 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true)
     
-    // Load and apply stored theme from cookies
-    const storedTheme = getStoredTheme()
-    
-    if (storedTheme) {
-      // Apply the stored theme immediately
-      applyStoredTheme()
-      setCurrentTheme(storedTheme)
-    } else {
-      // No stored theme, get current theme from HTML data attribute (fallback)
-      const htmlElement = document.querySelector('html')
-      const theme = htmlElement?.getAttribute('data-theme') || ''
-      setCurrentTheme(theme)
-    }
+    // Get current theme from HTML data attribute (already set by blocking script)
+    const htmlElement = document.querySelector('html')
+    const theme = htmlElement?.getAttribute('data-theme') || ''
+    setCurrentTheme(theme)
   }, [])
 
   const handleThemeChange = (theme: string) => {
