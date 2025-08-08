@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { formatDate, getProjectPosts } from '../utils'
 import { baseUrl } from '../../sitemap'
 import { ClientContent } from '../../components/client-content'
+import { InternalHoverButton } from '../../components/hover-button'
 
 export async function generateStaticParams() {
   let posts = getProjectPosts()
@@ -54,11 +55,20 @@ export async function generateMetadata({ params }) {
 
 export default async function Project({ params }) {
   const resolvedParams = await params
-  let post = getProjectPosts().find((post) => post.slug === resolvedParams.slug)
+  let allPosts = getProjectPosts()
+  let post = allPosts.find((post) => post.slug === resolvedParams.slug)
 
   if (!post) {
     notFound()
   }
+
+  // Determine previous and next posts based on publishedAt (ascending)
+  let ordered = [...allPosts].sort((a, b) =>
+    new Date(a.metadata.publishedAt) < new Date(b.metadata.publishedAt) ? -1 : 1
+  )
+  let index = ordered.findIndex((p) => p.slug === post!.slug)
+  let prevSlug = index > 0 ? ordered[index - 1].slug : null
+  let nextSlug = index < ordered.length - 1 ? ordered[index + 1].slug : null
 
   return (
     <section>
@@ -69,14 +79,14 @@ export default async function Project({ params }) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'CreativeWork',
-            headline: post.metadata.title,
-            datePublished: post.metadata.publishedAt,
-            dateModified: post.metadata.publishedAt,
-            description: post.metadata.summary,
-            image: post.metadata.image
-              ? `${baseUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/projects/${post.slug}`,
+            headline: post!.metadata.title,
+            datePublished: post!.metadata.publishedAt,
+            dateModified: post!.metadata.publishedAt,
+            description: post!.metadata.summary,
+            image: post!.metadata.image
+              ? `${baseUrl}${post!.metadata.image}`
+              : `/og?title=${encodeURIComponent(post!.metadata.title)}`,
+            url: `${baseUrl}/projects/${post!.slug}`,
             author: {
               '@type': 'Person',
               name: 'avan',
@@ -84,16 +94,33 @@ export default async function Project({ params }) {
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
-      </h1>
+
+      <div className="flex items-center justify-between">
+        <h1 className="title font-semibold text-2xl tracking-tighter">
+          {post!.metadata.title}
+        </h1>
+        <div className="flex space-x-2">
+          {prevSlug && (
+            <InternalHoverButton href={`/projects/${prevSlug}`} aria-label="Previous project">
+              &lt;
+            </InternalHoverButton>
+          )}
+          {nextSlug && (
+            <InternalHoverButton href={`/projects/${nextSlug}`} aria-label="Next project">
+              &gt;
+            </InternalHoverButton>
+          )}
+        </div>
+      </div>
+
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-[var(--color-accent)]">
-          {formatDate(post.metadata.publishedAt)}
+          {formatDate(post!.metadata.publishedAt)}
         </p>
       </div>
+
       <article className="prose">
-        <ClientContent content={post.content} />
+        <ClientContent content={post!.content} />
       </article>
     </section>
   )

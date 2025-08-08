@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/blog/utils'
 import { baseUrl } from 'app/sitemap'
 import { ClientContent } from 'app/components/client-content'
+import { InternalHoverButton } from 'app/components/hover-button'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -52,11 +53,20 @@ export function generateMetadata({ params }) {
 }
 
 export default function Blog({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+  let allPosts = getBlogPosts()
+  let post = allPosts.find((post) => post.slug === params.slug)
 
   if (!post) {
     notFound()
   }
+
+  // Determine previous and next posts based on publishedAt (ascending)
+  let ordered = [...allPosts].sort((a, b) =>
+    new Date(a.metadata.publishedAt) < new Date(b.metadata.publishedAt) ? -1 : 1
+  )
+  let index = ordered.findIndex((p) => p.slug === post!.slug)
+  let prevSlug = index > 0 ? ordered[index - 1].slug : null
+  let nextSlug = index < ordered.length - 1 ? ordered[index + 1].slug : null
 
   return (
     <section>
@@ -67,14 +77,14 @@ export default function Blog({ params }) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
-            headline: post.metadata.title,
-            datePublished: post.metadata.publishedAt,
-            dateModified: post.metadata.publishedAt,
-            description: post.metadata.summary,
-            image: post.metadata.image
-              ? `${baseUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+            headline: post!.metadata.title,
+            datePublished: post!.metadata.publishedAt,
+            dateModified: post!.metadata.publishedAt,
+            description: post!.metadata.summary,
+            image: post!.metadata.image
+              ? `${baseUrl}${post!.metadata.image}`
+              : `/og?title=${encodeURIComponent(post!.metadata.title)}`,
+            url: `${baseUrl}/blog/${post!.slug}`,
             author: {
               '@type': 'Person',
               name: 'My Portfolio',
@@ -82,16 +92,32 @@ export default function Blog({ params }) {
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
-      </h1>
+
+      <div className="flex items-center justify-between">
+        <h1 className="title font-semibold text-2xl tracking-tighter">
+          {post!.metadata.title}
+        </h1>
+        <div className="flex space-x-2">
+          {prevSlug && (
+            <InternalHoverButton href={`/blog/${prevSlug}`} aria-label="Previous post">
+              &lt;
+            </InternalHoverButton>
+          )}
+          {nextSlug && (
+            <InternalHoverButton href={`/blog/${nextSlug}`} aria-label="Next post">
+              &gt;
+            </InternalHoverButton>
+          )}
+        </div>
+      </div>
+
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-[var(--color-accent)]">
-          {formatDate(post.metadata.publishedAt)}
+          {formatDate(post!.metadata.publishedAt)}
         </p>
       </div>
       <article className="prose">
-        <ClientContent content={post.content} />
+        <ClientContent content={post!.content} />
       </article>
     </section>
   )
