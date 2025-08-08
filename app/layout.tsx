@@ -65,6 +65,15 @@ export default function RootLayout({
         GeistMono.variable
       )}
     >
+      <head>
+        {process.env.RYBBIT_SITE_ID && (
+          <script
+            src="https://app.rybbit.io/api/script.js"
+            data-site-id={process.env.RYBBIT_SITE_ID}
+            defer
+          />
+        )}
+      </head>
       <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
         <CustomCursor />
         <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
