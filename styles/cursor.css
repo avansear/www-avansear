@@ -1,54 +1,60 @@
 /* Custom Cursor Styles - Cross-browser compatibility */
 
-/* Base cursor hiding */
-html {
-  cursor: none;
-}
-
-body {
-  cursor: none;
-}
-
-*, *::before, *::after {
-  cursor: none !important;
-}
-
-/* Firefox-specific cursor hiding */
-@-moz-document url-prefix() {
-  html, body {
-    cursor: none !important;
+/* Base cursor hiding - only on md screens and larger (768px+) */
+@media (min-width: 768px) {
+  html {
+    cursor: none;
   }
-  
+
+  body {
+    cursor: none;
+  }
+
   *, *::before, *::after {
     cursor: none !important;
   }
-  
-  /* Force hide on all interactive elements in Firefox */
-  a, button, input, select, textarea, [role="button"], [tabindex] {
-    cursor: none !important;
-  }
-  
-  /* Firefox sometimes shows cursor on focus/hover */
-  *:hover, *:focus, *:active {
-    cursor: none !important;
+}
+
+/* Firefox-specific cursor hiding - only on desktop */
+@media (min-width: 768px) {
+  @-moz-document url-prefix() {
+    html, body {
+      cursor: none !important;
+    }
+    
+    *, *::before, *::after {
+      cursor: none !important;
+    }
+    
+    /* Force hide on all interactive elements in Firefox */
+    a, button, input, select, textarea, [role="button"], [tabindex] {
+      cursor: none !important;
+    }
+    
+    /* Firefox sometimes shows cursor on focus/hover */
+    *:hover, *:focus, *:active {
+      cursor: none !important;
+    }
   }
 }
 
-/* Safari/WebKit-specific cursor hiding */
-@supports (-webkit-appearance: none) {
-  html, body {
-    cursor: none !important;
-    -webkit-cursor: none !important;
-  }
-  
-  *, *::before, *::after {
-    cursor: none !important;
-    -webkit-cursor: none !important;
-  }
-  
-  /* Force hide cursor on interactive elements in Safari */
-  a, button, input, select, textarea, [role="button"] {
-    cursor: none !important;
-    -webkit-cursor: none !important;
+/* Safari/WebKit-specific cursor hiding - only on desktop */
+@media (min-width: 768px) {
+  @supports (-webkit-appearance: none) {
+    html, body {
+      cursor: none !important;
+      -webkit-cursor: none !important;
+    }
+    
+    *, *::before, *::after {
+      cursor: none !important;
+      -webkit-cursor: none !important;
+    }
+    
+    /* Force hide cursor on interactive elements in Safari */
+    a, button, input, select, textarea, [role="button"] {
+      cursor: none !important;
+      -webkit-cursor: none !important;
+    }
   }
 }

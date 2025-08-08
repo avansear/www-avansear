@@ -25,6 +25,7 @@ export function CustomCursor() {
   const [isVisible, setIsVisible] = useState(true) // Start visible for Safari
   const [isHovering, setIsHovering] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(true)
 
   const updateMousePosition = useCallback((e: MouseEvent) => {
     setMousePosition({ x: e.clientX, y: e.clientY })
@@ -34,6 +35,12 @@ export function CustomCursor() {
     const target = e.target as HTMLElement
     const isClickable = target.closest('a, button, [role="button"], input, select, textarea') !== null
     setIsHovering(isClickable)
+  }, [])
+
+  const checkScreenSize = useCallback(() => {
+    // md breakpoint is 768px in Tailwind
+    const isMdOrLarger = window.innerWidth >= 768
+    setIsDesktop(isMdOrLarger)
   }, [])
 
   useEffect(() => {
@@ -52,19 +59,26 @@ export function CustomCursor() {
     const isWebKit = userAgent.indexOf('webkit') > -1
     const hasCursorSupport = testCursorSupport()
     
-    // Set mounted state
+    // Set mounted state and check initial screen size
     setIsMounted(true)
+    checkScreenSize()
     
     const handleMouseEnter = () => setIsVisible(true)
     const handleMouseLeave = () => setIsVisible(false)
 
-    document.addEventListener('mousemove', updateMousePosition, { passive: true })
-    document.addEventListener('mouseenter', handleMouseEnter)
-    document.addEventListener('mouseleave', handleMouseLeave)
-    document.addEventListener('mouseover', handleMouseOver, { passive: true })
+    // Add resize listener for responsive behavior
+    window.addEventListener('resize', checkScreenSize, { passive: true })
+    
+    // Only add mouse listeners if desktop
+    if (isDesktop) {
+      document.addEventListener('mousemove', updateMousePosition, { passive: true })
+      document.addEventListener('mouseenter', handleMouseEnter)
+      document.addEventListener('mouseleave', handleMouseLeave)
+      document.addEventListener('mouseover', handleMouseOver, { passive: true })
+    }
 
-    // Browser-specific cursor hiding optimizations
-    if (isFirefox) {
+    // Browser-specific cursor hiding optimizations (only on desktop)
+    if (isDesktop && isFirefox) {
       // More aggressive Firefox cursor hiding
       document.body.style.cursor = 'none'
       document.documentElement.style.cursor = 'none'
@@ -100,7 +114,7 @@ export function CustomCursor() {
       ;(window as any).firefoxCursorInterval = firefoxCursorCheck
     }
     
-    if (isSafari || isWebKit) {
+    if (isDesktop && (isSafari || isWebKit)) {
       // Safari sometimes needs additional cursor hiding
       document.body.style.cursor = 'none'
       document.documentElement.style.cursor = 'none'
@@ -132,10 +146,16 @@ export function CustomCursor() {
     }
 
     return () => {
-      document.removeEventListener('mousemove', updateMousePosition)
-      document.removeEventListener('mouseenter', handleMouseEnter)
-      document.removeEventListener('mouseleave', handleMouseLeave)
-      document.removeEventListener('mouseover', handleMouseOver)
+      // Remove resize listener
+      window.removeEventListener('resize', checkScreenSize)
+      
+      // Remove mouse listeners (only if they were added)
+      if (isDesktop) {
+        document.removeEventListener('mousemove', updateMousePosition)
+        document.removeEventListener('mouseenter', handleMouseEnter)
+        document.removeEventListener('mouseleave', handleMouseLeave)
+        document.removeEventListener('mouseover', handleMouseOver)
+      }
       
       // Cleanup browser-specific styles
       if (isFirefox) {
@@ -166,14 +186,14 @@ export function CustomCursor() {
         document.body.removeAttribute('data-custom-cursor-style')
       }
     }
-  }, [updateMousePosition, handleMouseOver])
+  }, [updateMousePosition, handleMouseOver, checkScreenSize, isDesktop])
 
   // Calculate position with offset for hover state
   const offsetX = isHovering ? 6 : 4
   const offsetY = isHovering ? 6 : 4
 
-  // Don't render until mounted (helps with Safari)
-  if (!isMounted) {
+  // Don't render until mounted (helps with Safari) or on mobile/small screens
+  if (!isMounted || !isDesktop) {
     return null
   }
 
