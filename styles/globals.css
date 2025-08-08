@@ -8,5 +8,10 @@
     --color-dark: #0F0F0E;
     --color-light: #DBD2D2;
     --color-accent: #DBD2D2BF;
+    cursor: none;
+  }
+  
+  * {
+    cursor: none !important;
   }
 }
