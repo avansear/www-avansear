@@ -1,7 +1,7 @@
 'use client'
 
 import { InternalHoverButton } from './hover-button'
-import { changeTheme } from '../../utils/helper'
+import { changeTheme, getStoredTheme, applyStoredTheme } from '../../utils/helper'
 import { useState, useEffect } from 'react'
 
 const navItems = {
@@ -25,10 +25,20 @@ export function Navbar() {
 
   useEffect(() => {
     setMounted(true)
-    // Get current theme from HTML data attribute
-    const htmlElement = document.querySelector('html')
-    const theme = htmlElement?.getAttribute('data-theme') || ''
-    setCurrentTheme(theme)
+    
+    // Load and apply stored theme from cookies
+    const storedTheme = getStoredTheme()
+    
+    if (storedTheme) {
+      // Apply the stored theme immediately
+      applyStoredTheme()
+      setCurrentTheme(storedTheme)
+    } else {
+      // No stored theme, get current theme from HTML data attribute (fallback)
+      const htmlElement = document.querySelector('html')
+      const theme = htmlElement?.getAttribute('data-theme') || ''
+      setCurrentTheme(theme)
+    }
   }, [])
 
   const handleThemeChange = (theme: string) => {
