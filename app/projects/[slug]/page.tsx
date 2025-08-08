@@ -101,12 +101,12 @@ export default async function Project({ params }) {
         </h1>
         <div className="flex space-x-2">
           {prevSlug && (
-            <InternalHoverButton href={`/projects/${prevSlug}`} aria-label="Previous project">
+            <InternalHoverButton href={`/projects/${prevSlug}`}>
               &lt;
             </InternalHoverButton>
           )}
           {nextSlug && (
-            <InternalHoverButton href={`/projects/${nextSlug}`} aria-label="Next project">
+            <InternalHoverButton href={`/projects/${nextSlug}`}>
               &gt;
             </InternalHoverButton>
           )}

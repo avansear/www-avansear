@@ -32,3 +32,14 @@
   border-radius: 16px;
   margin: 16px 0px 16px 0px;
 }
+
+.change-hover {
+  position: relative;
+}
+
+.change-hover:hover:after {
+  content: attr(data-hover);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
