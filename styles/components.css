@@ -1,6 +1,6 @@
 /* Component styles */
 .btn-primary {
-  background-color: var(--color-accent);
+  background-color: var(--color-light-80);
   color: var(--color-dark);
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -19,11 +19,11 @@
 }
 
 .text-accent {
-  color: var(--color-accent);
+  color: var(--color-light-80);
 }
 
 .bg-accent {
-  background-color: var(--color-accent);
+  background-color: var(--color-light-80);
 }
 
 .postimg {
@@ -31,15 +31,4 @@
   height: auto;
   border-radius: 16px;
   margin: 16px 0px 16px 0px;
-}
-
-.change-hover {
-  position: relative;
-}
-
-.change-hover:hover:after {
-  content: attr(data-hover);
-  position: absolute;
-  top: 0;
-  left: 0;
 }

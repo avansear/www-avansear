@@ -2,6 +2,7 @@
 
 import { motion } from 'motion/react'
 import { useState, useEffect, useCallback } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 
 export function CustomCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -39,24 +40,37 @@ export function CustomCursor() {
     <motion.div
       className="fixed top-0 left-0 pointer-events-none z-50 will-change-transform"
       style={{
-        x: mousePosition.x - 8,
-        y: mousePosition.y - 8,
+        x: mousePosition.x - (isHovering ? 6 : 4),
+        y: mousePosition.y - (isHovering ? 6 : 4),
       }}
       animate={{
         opacity: isVisible ? 1 : 0,
-        scale: isHovering ? 1.2 : 1,
+        scale: isHovering ? 1 : [1, 1.6, 0.9],
       }}
       transition={{
         opacity: { duration: 0.15 },
-        scale: { 
-          type: "spring",
-          stiffness: 300,
-          damping: 25,
-          mass: 0.3
-        }
+        scale: isHovering 
+          ? { 
+              type: "spring",
+              stiffness: 300,
+              damping: 25,
+              mass: 0.3
+            }
+          : {
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }
       }}
     >
-      <div className="w-4 h-4 bg-[var(--color-light)] rounded-full" />
+      {isHovering ? (
+        <ArrowUpRight 
+          className="text-[var(--color-light)]" 
+          size={12}
+        />
+      ) : (
+        <div className="w-2 h-2 bg-[var(--color-light)] rounded-full" />
+      )}
     </motion.div>
   )
 }

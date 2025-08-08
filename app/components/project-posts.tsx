@@ -22,7 +22,7 @@ export function ProjectPosts() {
             href={`/projects/${post.slug}`}
           >
             <div className="w-full flex flex-row space-x-2">
-              <p className="text-[var(--color-accent)] w-fit tabular-nums flex-shrink-0">
+              <p className="text-[var(--color-light-80)] w-fit tabular-nums flex-shrink-0">
                 {formatDate(post.metadata.publishedAt, false)}
               </p>
               <p className="text-[var(--color-dark)] dark:text-[var(--color-light)] tracking-tight">
