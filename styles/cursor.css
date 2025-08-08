@@ -1,0 +1,44 @@
+/* Custom Cursor Styles - Cross-browser compatibility */
+
+/* Base cursor hiding */
+html {
+  cursor: none;
+}
+
+body {
+  cursor: none;
+}
+
+*, *::before, *::after {
+  cursor: none !important;
+}
+
+/* Firefox-specific cursor hiding */
+@-moz-document url-prefix() {
+  html, body {
+    cursor: none !important;
+  }
+  
+  * {
+    cursor: none !important;
+  }
+}
+
+/* Safari/WebKit-specific cursor hiding */
+@supports (-webkit-appearance: none) {
+  html, body {
+    cursor: none !important;
+    -webkit-cursor: none !important;
+  }
+  
+  *, *::before, *::after {
+    cursor: none !important;
+    -webkit-cursor: none !important;
+  }
+  
+  /* Force hide cursor on interactive elements in Safari */
+  a, button, input, select, textarea, [role="button"] {
+    cursor: none !important;
+    -webkit-cursor: none !important;
+  }
+}

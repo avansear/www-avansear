@@ -36,6 +36,12 @@ export function CustomCursor() {
   }, [])
 
   useEffect(() => {
+    // Browser detection for specific optimizations
+    const userAgent = navigator.userAgent.toLowerCase()
+    const isFirefox = userAgent.indexOf('firefox') > -1
+    const isSafari = userAgent.indexOf('safari') > -1 && userAgent.indexOf('chrome') === -1
+    const isWebKit = userAgent.indexOf('webkit') > -1
+    
     const handleMouseEnter = () => setIsVisible(true)
     const handleMouseLeave = () => setIsVisible(false)
 
@@ -44,20 +50,67 @@ export function CustomCursor() {
     document.addEventListener('mouseleave', handleMouseLeave)
     document.addEventListener('mouseover', handleMouseOver, { passive: true })
 
+    // Browser-specific cursor hiding optimizations
+    if (isFirefox) {
+      document.body.style.cursor = 'none'
+      document.documentElement.style.cursor = 'none'
+    }
+    
+    if (isSafari || isWebKit) {
+      // Safari sometimes needs additional cursor hiding
+      document.body.style.cursor = 'none'
+      document.documentElement.style.cursor = 'none'
+      // Force Safari to respect cursor: none on all elements
+      const style = document.createElement('style')
+      style.textContent = `
+        *, *::before, *::after {
+          cursor: none !important;
+          -webkit-cursor: none !important;
+        }
+      `
+      document.head.appendChild(style)
+      
+      // Store reference for cleanup
+      document.body.setAttribute('data-custom-cursor-style', 'true')
+    }
+
     return () => {
       document.removeEventListener('mousemove', updateMousePosition)
       document.removeEventListener('mouseenter', handleMouseEnter)
       document.removeEventListener('mouseleave', handleMouseLeave)
       document.removeEventListener('mouseover', handleMouseOver)
+      
+      // Cleanup browser-specific styles
+      if (isFirefox) {
+        document.body.style.cursor = ''
+        document.documentElement.style.cursor = ''
+      }
+      
+      if (isSafari || isWebKit) {
+        document.body.style.cursor = ''
+        document.documentElement.style.cursor = ''
+        // Remove Safari-specific style injection
+        const styleElements = document.querySelectorAll('style')
+        styleElements.forEach(el => {
+          if (el.textContent?.includes('-webkit-cursor: none')) {
+            el.remove()
+          }
+        })
+        document.body.removeAttribute('data-custom-cursor-style')
+      }
     }
   }, [updateMousePosition, handleMouseOver])
 
+  // Calculate position with offset for hover state
+  const offsetX = isHovering ? 6 : 4
+  const offsetY = isHovering ? 6 : 4
+
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-50 will-change-transform"
+      className="fixed top-0 left-0 pointer-events-none z-50"
       style={{
-        x: mousePosition.x - (isHovering ? 6 : 4),
-        y: mousePosition.y - (isHovering ? 6 : 4),
+        transform: `translate3d(${mousePosition.x - offsetX}px, ${mousePosition.y - offsetY}px, 0)`,
+        willChange: 'transform, opacity'
       }}
       animate={{
         opacity: isVisible ? 1 : 0,
