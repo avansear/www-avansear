@@ -74,7 +74,7 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
+      <body className="antialiased max-w-xl mx-4 mt-8 sm:mx-auto">
         <script
           dangerouslySetInnerHTML={{
             __html: `
