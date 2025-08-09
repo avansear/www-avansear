@@ -14,7 +14,7 @@ export default function Page() {
         onMouseLeave={() => setIsHovered(false)}
       >
         <motion.h1 
-          className="mb-8 text-2xl font-semibold tracking-tighter"
+          className="sm:mb-8 text-2xl font-semibold tracking-tighter"
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
@@ -32,7 +32,7 @@ export default function Page() {
         </motion.h1>
       </div>
       
-      <p className="mb-4">
+      <p className="sm:mb-4">
         {`high functioning insomniac. 20 y/o weirdo who does things based on instincts and intuition.`}
       </p>
     </section>
