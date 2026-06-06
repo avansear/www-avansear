@@ -7,6 +7,7 @@ import { Music, Star } from 'lucide-react'
 import { AnimatedHeading } from 'app/components/animated-heading'
 import { BackgroundAudio } from 'app/components/background-audio'
 import { SpinningDisc } from 'app/components/spinning-disc'
+import { FetchSongsTrigger } from 'app/components/fetch-songs-trigger'
 
 const homePillClassName =
   'inline-flex items-center gap-2 rounded-full border border-[var(--color-dark)]/15 bg-[var(--color-light)]/85 px-3 py-1.5 text-xs shadow-sm backdrop-blur-md transition-colors hover:bg-[var(--color-light)]/95 dark:border-[var(--color-light)]/15 dark:bg-[var(--color-dark)]/85 dark:hover:bg-[var(--color-dark)]/95 text-[var(--color-dark)] dark:text-[var(--color-light)]'
@@ -17,6 +18,7 @@ export default function Page() {
   return (
     <section>
       <BackgroundAudio />
+      <FetchSongsTrigger />
       <div className="p-4 -m-4 mb-4 sm:-mb-4">
         <AnimatedHeading 
           className="text-2xl font-semibold tracking-tighter"
