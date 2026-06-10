@@ -6,7 +6,9 @@
       "Bash(git push *)",
       "Bash(bun --version)",
       "Bash(curl -fsSL https://bun.sh/install)",
-      "Bash(bash)"
+      "Bash(bash)",
+      "Bash(mkdir -p /home/avan/github/www-avansear/private)",
+      "Bash(mv /home/avan/github/www-avansear/public/resume.pdf /home/avan/github/www-avansear/private/resume.pdf)"
     ]
   }
 }
