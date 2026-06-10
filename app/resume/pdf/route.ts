@@ -3,7 +3,7 @@ import { join } from 'path'
 import { NextResponse } from 'next/server'
 
 export function GET() {
-  const filePath = join(process.cwd(), 'private', 'resume.pdf')
+  const filePath = join(process.cwd(), 'public', 'resume.pdf')
   const file = readFileSync(filePath)
 
   return new NextResponse(file, {
