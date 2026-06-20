@@ -1,14 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/unsplash',
-        destination: 'https://unsplash.com/@avansear',
-        permanent: false,
-      },
-    ]
-  },
   async rewrites() {
     return [
       {
