@@ -7,7 +7,8 @@ export function BackgroundAudio() {
   const containerRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<YT.Player | null>(null)
   const isReadyRef = useRef(false)
-  const playOnReadyRef = useRef(false)
+  const hasInteractedRef = useRef(false)
+  const pendingUnmuteRef = useRef(false)
 
   useEffect(() => {
     const ac = new AbortController()
@@ -44,14 +45,14 @@ export function BackgroundAudio() {
       }
       isReadyRef.current = false
 
-      // ponytail: host not in @types/youtube but accepted at runtime for nocookie embed
+      // ponytail: host not in @types/youtube but accepted at runtime; nocookie avoids Firefox ETP blocking
       const playerOptions = {
         host: 'https://www.youtube-nocookie.com',
         width: 480,
         height: 270,
         videoId: youtubeId ?? undefined,
         playerVars: {
-          autoplay: 0, // no autoplay — play only on explicit user click
+          autoplay: 1,
           controls: 0,
           disablekb: 1,
           enablejsapi: 1,
@@ -61,21 +62,23 @@ export function BackgroundAudio() {
           playsinline: 1,
           rel: 0,
           showinfo: 0,
-          mute: 1, // stay muted until user clicks; unMute() on play
+          mute: 1, // start muted; unmuted on first user interaction
         },
         events: {
           onReady: (event: YT.PlayerEvent) => {
             if (destroyed) return
             isReadyRef.current = true
-            if (playOnReadyRef.current) {
-              playOnReadyRef.current = false
-              event.target.unMute()
-              event.target.playVideo()
+            try { event.target.playVideo() } catch { /* ignore */ }
+            if (pendingUnmuteRef.current) {
+              hasInteractedRef.current = true
+              pendingUnmuteRef.current = false
+              try { event.target.unMute() } catch { /* ignore */ }
             }
           },
           onStateChange: (event: YT.OnStateChangeEvent) => {
+            // only signal playing when unmuted (hasInteracted) so disc doesn't spin while muted
             window.dispatchEvent(new CustomEvent('audioPlaying', {
-              detail: event.data === YT.PlayerState.PLAYING,
+              detail: event.data === YT.PlayerState.PLAYING && hasInteractedRef.current,
             }))
           },
           onError: (event: YT.PlayerEvent) => {
@@ -97,21 +100,41 @@ export function BackgroundAudio() {
       window.onYouTubeIframeAPIReady = createPlayer
     }
 
-    const handleTriggerPlay = () => {
+    // Any page interaction unmutes (click/touch/key — not scroll, scroll isn't a user activation)
+    const handleInteraction = () => {
+      if (hasInteractedRef.current) return
       if (!isReadyRef.current || !playerRef.current) {
-        playOnReadyRef.current = true
+        pendingUnmuteRef.current = true
         return
       }
+      hasInteractedRef.current = true
       try {
         playerRef.current.unMute()
-        playerRef.current.playVideo()
+        if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
+          playerRef.current.playVideo()
+        }
+        window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
+      } catch (e) {
+        console.error('BackgroundAudio: unmute failed', e)
+      }
+    }
+
+    const handleTriggerPlay = () => {
+      hasInteractedRef.current = true
+      pendingUnmuteRef.current = false
+      if (!isReadyRef.current || !playerRef.current) return
+      try {
+        playerRef.current.unMute()
+        if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
+          playerRef.current.playVideo()
+        }
+        window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
       } catch (e) {
         console.error('BackgroundAudio: play failed', e)
       }
     }
 
     const handleTriggerPause = () => {
-      playOnReadyRef.current = false
       if (!isReadyRef.current || !playerRef.current) return
       try {
         playerRef.current.pauseVideo()
@@ -121,11 +144,14 @@ export function BackgroundAudio() {
       }
     }
 
+    const interactionEvents = ['click', 'touchstart', 'keydown'] as const
+    interactionEvents.forEach((ev) => window.addEventListener(ev, handleInteraction))
     window.addEventListener('triggerAudioPlay', handleTriggerPlay)
     window.addEventListener('triggerAudioPause', handleTriggerPause)
 
     return () => {
       destroyed = true
+      interactionEvents.forEach((ev) => window.removeEventListener(ev, handleInteraction))
       window.removeEventListener('triggerAudioPlay', handleTriggerPlay)
       window.removeEventListener('triggerAudioPause', handleTriggerPause)
       if ((window.onYouTubeIframeAPIReady as unknown) === createPlayer) {
