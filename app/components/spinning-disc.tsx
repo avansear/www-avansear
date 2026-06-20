@@ -2,13 +2,15 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { Play } from 'lucide-react'
-import Link from 'next/link'
 
 interface AlbumInfo {
   songName: string
   artist: string
   albumArt: string | null
   albumName: string | null
+  trackUrl: string | null
+  albumUrl: string | null
+  artistUrl: string | null
 }
 
 export function SpinningDisc() {
@@ -200,20 +202,20 @@ export function SpinningDisc() {
       {/* Song Info */}
       <div className="space-y-1">
         <h3 className="text-lg font-semibold tracking-tighter text-[var(--color-dark)] dark:text-[var(--color-light)]">
-          <Link href="/musix" className="hover:underline">
-          {albumInfo.songName.toLowerCase()}
-          </Link>
+          {albumInfo.trackUrl
+            ? <a href={albumInfo.trackUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{albumInfo.songName.toLowerCase()}</a>
+            : albumInfo.songName.toLowerCase()}
         </h3>
         <p className="text-sm tracking-tight text-[var(--color-light)]/80">
-          <Link href="/musix" className="hover:underline">
-          {albumInfo.artist.toLowerCase()}
-          </Link>
+          {albumInfo.artistUrl
+            ? <a href={albumInfo.artistUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{albumInfo.artist.toLowerCase()}</a>
+            : albumInfo.artist.toLowerCase()}
         </p>
         {albumInfo.albumName && (
           <p className="text-xs tracking-tight text-[var(--color-light)]/80 italic">
-            <Link href="/musix" className="hover:underline">
-            {albumInfo.albumName.toLowerCase()}
-            </Link>
+            {albumInfo.albumUrl
+              ? <a href={albumInfo.albumUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{albumInfo.albumName.toLowerCase()}</a>
+              : albumInfo.albumName.toLowerCase()}
           </p>
         )}
       </div>
