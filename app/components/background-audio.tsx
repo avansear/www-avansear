@@ -2,35 +2,23 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-interface BackgroundAudioProps {
-  // No props needed - will fetch from API
-}
-
-export function BackgroundAudio({}: BackgroundAudioProps) {
+export function BackgroundAudio() {
   const [youtubeId, setYoutubeId] = useState<string | null>(null)
   const youtubeContainerRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<YT.Player | null>(null)
   const isReadyRef = useRef(false)
   const hasInteractedRef = useRef(false)
+  const pendingUnmuteRef = useRef(false)
   const currentYoutubeIdRef = useRef<string | null>(null)
 
-  // Fetch latest song and search YouTube for it (abort on cleanup to avoid double-fetch in Strict Mode / Arc)
   useEffect(() => {
     const ac = new AbortController()
     async function fetchAndPlayLatestSong() {
       try {
-        console.log('BackgroundAudio: Fetching latest song...')
         const response = await fetch('/api/musix/latest-song', { signal: ac.signal })
         const data = await response.json()
-
         if (ac.signal.aborted) return
-        if (!data.songName || !data.artist) {
-          console.log('BackgroundAudio: No song found')
-          return
-        }
-
-        console.log('BackgroundAudio: Found song:', data.songName, 'by', data.artist)
-
+        if (!data.songName || !data.artist) return
         const searchResponse = await fetch('/api/musix/search-youtube', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -38,101 +26,39 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
           signal: ac.signal,
         })
         const searchData = await searchResponse.json()
-
         if (ac.signal.aborted) return
-        if (searchData.youtubeId) {
-          console.log('BackgroundAudio: Found YouTube ID:', searchData.youtubeId)
-          setYoutubeId(searchData.youtubeId)
-        } else {
-          console.log('BackgroundAudio: No YouTube video found')
-        }
+        if (searchData.youtubeId) setYoutubeId(searchData.youtubeId)
       } catch (e) {
         if (e instanceof Error && e.name === 'AbortError') return
-        console.error('BackgroundAudio: Error:', e)
+        console.error('BackgroundAudio: Error fetching song:', e)
       }
     }
     fetchAndPlayLatestSong()
     return () => ac.abort()
   }, [])
 
-  // Handle YouTube embed
   useEffect(() => {
     if (!youtubeId) {
-      console.log('BackgroundAudio: No youtubeId provided')
-      // Destroy player if youtubeId is removed
       if (playerRef.current) {
-        try {
-          playerRef.current.destroy()
-          playerRef.current = null
-        } catch (e) {
-          // Ignore cleanup errors
-        }
+        try { playerRef.current.destroy() } catch { /* ignore */ }
+        playerRef.current = null
       }
       currentYoutubeIdRef.current = null
       return
     }
 
-    // If we already have a player for this video ID, don't reinitialize
-    if (currentYoutubeIdRef.current === youtubeId && playerRef.current) {
-      console.log('BackgroundAudio: Player already exists for this video ID')
-      return
-    }
+    if (currentYoutubeIdRef.current === youtubeId && playerRef.current) return
 
-    console.log('BackgroundAudio: Initializing player with youtubeId:', youtubeId)
     currentYoutubeIdRef.current = youtubeId
 
-    // Load YouTube IFrame API script (only if not already loaded)
-    if (!window.YT) {
-      const tag = document.createElement('script')
-      tag.src = 'https://www.youtube.com/iframe_api'
-      const firstScriptTag = document.getElementsByTagName('script')[0]
-      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
-    }
-
-    // Wait for YouTube API to be ready
-    let checkYT: NodeJS.Timeout | null = null
-    
-    if (window.YT && window.YT.Player) {
-      initializePlayer()
-    } else {
-      checkYT = setInterval(() => {
-        if (window.YT && window.YT.Player) {
-          if (checkYT) clearInterval(checkYT)
-          initializePlayer()
-        }
-      }, 100)
-
-      // Also handle the onYouTubeIframeAPIReady callback
-      window.onYouTubeIframeAPIReady = () => {
-        if (checkYT) clearInterval(checkYT)
-        initializePlayer()
-      }
-    }
-
     function initializePlayer() {
-      if (!youtubeId || !youtubeContainerRef.current) {
-        console.log('BackgroundAudio: Cannot initialize - missing youtubeId or container')
-        return
-      }
-
-      console.log('BackgroundAudio: Creating YouTube player with videoId:', youtubeId)
-      
-      // Destroy existing player if it exists
+      if (!youtubeId || !youtubeContainerRef.current) return
       if (playerRef.current) {
-        try {
-          console.log('BackgroundAudio: Destroying existing player')
-          playerRef.current.destroy()
-        } catch (e) {
-          console.error('BackgroundAudio: Error destroying player:', e)
-        }
+        try { playerRef.current.destroy() } catch { /* ignore */ }
         playerRef.current = null
       }
-
-      // Reset ready state
       isReadyRef.current = false
 
-      // Create hidden player — YouTube requires viewport ≥200×200; we use 480×270 and hide it off‑screen
-      console.log('BackgroundAudio: Creating new YouTube player')
       playerRef.current = new window.YT.Player(youtubeContainerRef.current, {
         width: 480,
         height: 270,
@@ -148,27 +74,23 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
           playsinline: 1,
           rel: 0,
           showinfo: 0,
-          mute: 1, // Start muted due to autoplay policies
+          mute: 1,
         },
         events: {
           onReady: (event: YT.PlayerEvent) => {
-            console.log('BackgroundAudio: Player ready, attempting to play')
             isReadyRef.current = true
-            // Try to play (will be muted)
-            try {
-              event.target.playVideo()
-            } catch (e) {
-              console.error('BackgroundAudio: Error playing video:', e)
+            try { event.target.playVideo() } catch { /* ignore */ }
+            // honour any interaction that happened before the player was ready
+            if (pendingUnmuteRef.current) {
+              hasInteractedRef.current = true
+              pendingUnmuteRef.current = false
+              try { event.target.unMute() } catch { /* ignore */ }
             }
           },
           onStateChange: (event: YT.OnStateChangeEvent) => {
-            console.log('BackgroundAudio: Player state changed:', event.data)
-            // Only spin disc when playing AND unmuted (after user interaction)
             if (event.data === YT.PlayerState.PLAYING && hasInteractedRef.current) {
-              // Playing and unmuted - spin the disc
               window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
             } else {
-              // Not playing, or playing but muted - don't spin
               window.dispatchEvent(new CustomEvent('audioPlaying', { detail: false }))
             }
           },
@@ -176,91 +98,86 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
             console.error('BackgroundAudio: Player error:', event.data)
           },
           onAutoplayBlocked: () => {
-            console.log('BackgroundAudio: Autoplay blocked by browser — user interaction required')
             window.dispatchEvent(new CustomEvent('autoplayBlocked'))
           },
         },
       })
     }
 
-    // Listen for user interaction to unmute
+    if (window.YT?.Player) {
+      initializePlayer()
+    } else {
+      // Load the API script if not already inserted
+      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+        const tag = document.createElement('script')
+        tag.src = 'https://www.youtube.com/iframe_api'
+        document.head.appendChild(tag)
+      }
+      // onYouTubeIframeAPIReady is the canonical callback; no polling needed
+      window.onYouTubeIframeAPIReady = initializePlayer
+    }
+
     const handleInteraction = () => {
-      if (!hasInteractedRef.current && isReadyRef.current && playerRef.current) {
-        hasInteractedRef.current = true
-        try {
-          playerRef.current.unMute()
-          // Ensure it's playing
-          if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
-            playerRef.current.playVideo()
-          }
-          // Check if already playing and dispatch event
-          if (playerRef.current.getPlayerState() === YT.PlayerState.PLAYING) {
+      if (hasInteractedRef.current) return
+      if (!isReadyRef.current || !playerRef.current) {
+        // Player not ready yet — store intent, act on it in onReady
+        pendingUnmuteRef.current = true
+        return
+      }
+      hasInteractedRef.current = true
+      try {
+        playerRef.current.unMute()
+        if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
+          playerRef.current.playVideo()
+        }
+        if (playerRef.current.getPlayerState() === YT.PlayerState.PLAYING) {
+          window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
+        }
+      } catch (e) {
+        console.error('BackgroundAudio: Failed to unmute:', e)
+      }
+    }
+
+    const handleTriggerPlay = () => {
+      if (!isReadyRef.current || !playerRef.current) return
+      hasInteractedRef.current = true
+      pendingUnmuteRef.current = false
+      try {
+        playerRef.current.unMute()
+        if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
+          playerRef.current.playVideo()
+        }
+        setTimeout(() => {
+          if (playerRef.current?.getPlayerState() === YT.PlayerState.PLAYING) {
             window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
           }
-        } catch (e) {
-          console.error('Failed to unmute:', e)
-        }
+        }, 100)
+      } catch (e) {
+        console.error('BackgroundAudio: Failed to play:', e)
       }
     }
 
-    // Handle explicit play button click
-    const handleTriggerPlay = () => {
-      if (isReadyRef.current && playerRef.current) {
-        hasInteractedRef.current = true
-        try {
-          // Unmute and play
-          playerRef.current.unMute()
-          if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
-            playerRef.current.playVideo()
-          }
-          // Dispatch playing state
-          setTimeout(() => {
-            if (playerRef.current && playerRef.current.getPlayerState() === YT.PlayerState.PLAYING) {
-              window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
-            }
-          }, 100)
-        } catch (e) {
-          console.error('Failed to play audio:', e)
-        }
-      }
-    }
-
-    // Handle explicit pause button click
     const handleTriggerPause = () => {
-      if (isReadyRef.current && playerRef.current) {
-        try {
-          playerRef.current.pauseVideo()
-          // Dispatch paused state immediately
-          window.dispatchEvent(new CustomEvent('audioPlaying', { detail: false }))
-        } catch (e) {
-          console.error('Failed to pause audio:', e)
-        }
+      if (!isReadyRef.current || !playerRef.current) return
+      try {
+        playerRef.current.pauseVideo()
+        window.dispatchEvent(new CustomEvent('audioPlaying', { detail: false }))
+      } catch (e) {
+        console.error('BackgroundAudio: Failed to pause:', e)
       }
     }
 
-    // Add event listeners for user interaction
-    const events = ['click', 'touchstart', 'keydown', 'scroll']
-    events.forEach((event) => {
-      window.addEventListener(event, handleInteraction, { once: true })
-    })
-
-    // Listen for explicit play/pause button triggers
+    const interactionEvents = ['click', 'touchstart', 'keydown', 'scroll'] as const
+    interactionEvents.forEach((ev) => window.addEventListener(ev, handleInteraction))
     window.addEventListener('triggerAudioPlay', handleTriggerPlay)
     window.addEventListener('triggerAudioPause', handleTriggerPause)
 
     return () => {
-      if (checkYT) clearInterval(checkYT)
-      events.forEach((event) => {
-        window.removeEventListener(event, handleInteraction)
-      })
+      interactionEvents.forEach((ev) => window.removeEventListener(ev, handleInteraction))
       window.removeEventListener('triggerAudioPlay', handleTriggerPlay)
       window.removeEventListener('triggerAudioPause', handleTriggerPause)
       if (playerRef.current) {
-        try {
-          playerRef.current.destroy()
-        } catch (e) {
-          // Ignore cleanup errors
-        }
+        try { playerRef.current.destroy() } catch { /* ignore */ }
       }
     }
   }, [youtubeId])
@@ -269,15 +186,7 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
 
   return (
     <div
-      style={{
-        position: 'absolute',
-        left: -9999,
-        top: 0,
-        width: 480,
-        height: 270,
-        overflow: 'hidden',
-        pointerEvents: 'none',
-      }}
+      style={{ position: 'absolute', left: -9999, top: 0, width: 480, height: 270, overflow: 'hidden', pointerEvents: 'none' }}
       aria-hidden="true"
     >
       <div ref={youtubeContainerRef} style={{ width: 480, height: 270 }} />

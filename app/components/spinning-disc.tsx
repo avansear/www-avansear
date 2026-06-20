@@ -31,15 +31,6 @@ export function SpinningDisc() {
         return res.json()
       })
       .then((data) => {
-        console.log('SpinningDisc: Received album data:', {
-          songName: data?.songName,
-          artist: data?.artist,
-          albumName: data?.albumName,
-          albumArt: data?.albumArt ? `${data.albumArt.substring(0, 50)}...` : null,
-          hasAlbumArt: !!data?.albumArt,
-          albumArtType: typeof data?.albumArt,
-          albumArtValue: data?.albumArt,
-        })
         if (data && data.songName) {
           setAlbumInfo(data)
         }
@@ -172,9 +163,6 @@ export function SpinningDisc() {
                     fallback.innerHTML = '<div class="text-2xl">🎵</div>'
                     parent.appendChild(fallback)
                   }
-                }}
-                onLoad={() => {
-                  console.log('Album art loaded successfully:', albumInfo.albumArt)
                 }}
               />
               {/* 50% overlay of --color-dark */}
