@@ -45,6 +45,7 @@ export function BackgroundAudio() {
       isReadyRef.current = false
 
       playerRef.current = new window.YT.Player(containerRef.current, {
+        host: 'https://www.youtube-nocookie.com',
         width: 480,
         height: 270,
         videoId: youtubeId ?? undefined,
