@@ -8,7 +8,13 @@
       "Bash(curl -fsSL https://bun.sh/install)",
       "Bash(bash)",
       "Bash(mkdir -p /home/avan/github/www-avansear/private)",
-      "Bash(mv /home/avan/github/www-avansear/public/resume.pdf /home/avan/github/www-avansear/private/resume.pdf)"
+      "Bash(mv /home/avan/github/www-avansear/public/resume.pdf /home/avan/github/www-avansear/private/resume.pdf)",
+      "Bash(git -C /home/avan/github/www-avansear status)",
+      "Bash(git -C /home/avan/github/www-avansear diff)",
+      "Bash(git -C /home/avan/github/www-avansear add next.config.js)",
+      "Bash(git -C /home/avan/github/www-avansear commit -m ' *)",
+      "Bash(git *)",
+      "Bash(ssh -T git@github.com)"
     ]
   }
 }
