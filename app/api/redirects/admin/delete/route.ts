@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { verifyRedirectsAdminSessionToken, REDIRECTS_ADMIN_COOKIE } from 'lib/redirects-admin-session'
-import { createServiceRoleSupabase } from 'lib/travelogue-markers'
+import { createServiceRoleSupabase } from 'lib/supabase'
 
 export async function POST(request: Request) {
   const cookieStore = await cookies()

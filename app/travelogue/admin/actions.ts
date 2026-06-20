@@ -6,7 +6,8 @@ import {
   TRAVELOGUE_ADMIN_COOKIE,
   verifyTravelogueAdminSessionToken,
 } from 'lib/travelogue-admin-session'
-import { createServiceRoleSupabase, type TravelogueMarkerType } from 'lib/travelogue-markers'
+import { createServiceRoleSupabase } from 'lib/supabase'
+import { type TravelogueMarkerType } from 'lib/travelogue-markers'
 
 async function requireAdminSession(): Promise<boolean> {
   const cookieStore = await cookies()

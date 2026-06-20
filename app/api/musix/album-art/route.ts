@@ -1,11 +1,6 @@
 import { getArchivedSongs } from '../../../musix/db'
+import { getSpotifyAccessToken } from '../../../musix/spotify'
 import { NextResponse } from 'next/server'
-
-interface SpotifyTokenResponse {
-  access_token: string
-  token_type: string
-  expires_in: number
-}
 
 interface SpotifyTrackResponse {
   id: string
@@ -15,28 +10,6 @@ interface SpotifyTrackResponse {
     name: string
     images: Array<{ url: string; height: number; width: number }>
   }
-}
-
-async function getSpotifyAccessToken(clientId: string, clientSecret: string): Promise<string> {
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-    }),
-  })
-
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Spotify auth error: ${response.status} ${error}`)
-  }
-
-  const data: SpotifyTokenResponse = await response.json()
-  return data.access_token
 }
 
 async function getSpotifyTrackInfo(accessToken: string, trackId: string): Promise<{ albumArt: string | null; albumName: string | null; success: boolean }> {

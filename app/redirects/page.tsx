@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { Navbar } from '../components/nav'
 import { AnimatedHeading } from '../components/animated-heading'
 import { verifyRedirectsAdminSessionToken, REDIRECTS_ADMIN_COOKIE } from 'lib/redirects-admin-session'
-import { createServiceRoleSupabase } from 'lib/travelogue-markers'
+import { createServiceRoleSupabase } from 'lib/supabase'
 import { RedirectsClient } from './redirects-client'
 
 export const dynamic = 'force-dynamic'

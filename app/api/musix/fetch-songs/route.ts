@@ -1,4 +1,5 @@
 import { getExistingSongs, addSong, getRateLimitExecutions, addRateLimitExecution, cleanOldRateLimitExecutions } from '../../../musix/db'
+import { getSpotifyAccessToken } from '../../../musix/spotify'
 
 const MAX_EXECUTIONS = 50
 const WINDOW_HOURS = 24
@@ -29,12 +30,6 @@ async function recordExecution() {
   await addRateLimitExecution()
 }
 
-interface SpotifyTokenResponse {
-  access_token: string
-  token_type: string
-  expires_in: number
-}
-
 interface SpotifyTrack {
   track: {
     id: string
@@ -45,28 +40,6 @@ interface SpotifyTrack {
       images: Array<{ url: string; height: number; width: number }>
     }
   }
-}
-
-async function getSpotifyAccessToken(clientId: string, clientSecret: string): Promise<string> {
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-    }),
-  })
-
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Spotify auth error: ${response.status} ${error}`)
-  }
-
-  const data: SpotifyTokenResponse = await response.json()
-  return data.access_token
 }
 
 async function getPlaylistTracks(accessToken: string, playlistId: string): Promise<SpotifyTrack[]> {

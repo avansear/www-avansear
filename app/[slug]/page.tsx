@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation'
-import { createServiceRoleSupabase } from 'lib/travelogue-markers'
+import { createServiceRoleSupabase } from 'lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
