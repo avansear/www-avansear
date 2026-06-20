@@ -14,7 +14,8 @@
       "Bash(git -C /home/avan/github/www-avansear add next.config.js)",
       "Bash(git -C /home/avan/github/www-avansear commit -m ' *)",
       "Bash(git *)",
-      "Bash(ssh -T git@github.com)"
+      "Bash(ssh -T git@github.com)",
+      "Skill(run)"
     ]
   }
 }
