@@ -47,7 +47,7 @@ export function BackgroundAudio() {
       playerRef.current = new window.YT.Player(containerRef.current, {
         width: 480,
         height: 270,
-        videoId: youtubeId,
+        videoId: youtubeId ?? undefined,
         playerVars: {
           autoplay: 0, // no autoplay — play only on explicit user click
           controls: 0,
