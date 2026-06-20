@@ -44,7 +44,8 @@ export function BackgroundAudio() {
       }
       isReadyRef.current = false
 
-      playerRef.current = new window.YT.Player(containerRef.current, {
+      // ponytail: host not in @types/youtube but accepted at runtime for nocookie embed
+      const playerOptions = {
         host: 'https://www.youtube-nocookie.com',
         width: 480,
         height: 270,
@@ -81,7 +82,8 @@ export function BackgroundAudio() {
             console.error('BackgroundAudio: player error', event.data)
           },
         },
-      })
+      }
+      playerRef.current = new window.YT.Player(containerRef.current, playerOptions as YT.PlayerOptions)
     }
 
     if (window.YT?.Player) {
