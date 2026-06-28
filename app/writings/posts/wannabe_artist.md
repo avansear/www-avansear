@@ -1,7 +1,7 @@
 ---
 title: 'wannabe artist'
 publishedAt: '2026-06-29'
-summary: 'i feel like i've lost it, and idk how to get it back, kinda if ykwim?'
+summary: 'i feel like i have lost it, and idk how to get it back, kinda if ykwim?'
 ---
 man, idk what to do, i want to be an artist, i want to open my tab and draw. i want to want to be an artist.
 <br><br>
